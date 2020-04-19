@@ -1,5 +1,13 @@
 .App {
   text-align: center;
+  
+}
+
+.Tabla {
+  position: absolute;
+  width: 50%;
+  height: auto;
+  background-color: white;
 }
 
 .App-logo {
@@ -36,3 +44,4 @@
     transform: rotate(360deg);
   }
 }
+
