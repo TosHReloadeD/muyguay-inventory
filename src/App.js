@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
-import { firebase } from './firebase';
-import { TablaComponent } from './components/tabla/tabla.component';
-import { SearchComponent } from './components/search/search.component';
-import { SellingFormComponent } from './components/sellingForm/sellingForm.component';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
-import { NavBarComponent } from './components/navBar/navBar.component';
-import Container from '@material-ui/core/Container';
-import { SideBarComponent } from './components/sideBar/sideBar.component';
-import Box from '@material-ui/core/Box';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import { firebase } from "./firebase";
+import { TablaComponent } from "./components/tabla/tabla.component";
+import { SearchComponent } from "./components/search/search.component";
+import { SellingFormComponent } from "./components/sellingForm/sellingForm.component";
+import Grid from "@material-ui/core/Grid";
+import Button from "@material-ui/core/Button";
+import { NavBarComponent } from "./components/navBar/navBar.component";
+import Container from "@material-ui/core/Container";
+import { SideBarComponent } from "./components/sideBar/sideBar.component";
+import Box from "@material-ui/core/Box";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { ClientListComponent } from "./components/clientList/clientList.component";
 
 const App = () => {
   const [products, setProducts] = useState(null);
@@ -23,22 +24,37 @@ const App = () => {
   const fetchProduts = async () => {
     firebase
       .firestore()
-      .collection('products')
+      .collection("products")
       .onSnapshot((serverUpdate) => {
         const products = serverUpdate.docs.map((_doc) => {
           const data = _doc.data();
-          data['id'] = _doc.id;
+          data["id"] = _doc.id;
           return data;
         });
         setProducts(products);
         setFilteredProducts(products);
       });
-  }
+  };
+
+  const fetchClients = async () => {
+    firebase
+      .firestore()
+      .collection("clients")
+      .onSnapshot((serverUpdate) => {
+        const clients = serverUpdate.docs.map((_doc) => {
+          const data = _doc.data();
+          data["id"] = _doc.id;
+          return data;
+        });
+        setClients(clients);
+      });
+
+    //var clientsdb = firebase.collection('clients')
+  };
 
   useEffect(() => {
-    fetchProduts()
-
-    
+    fetchProduts();
+    fetchClients();
   }, []);
 
   useEffect(() => {
@@ -57,35 +73,29 @@ const App = () => {
 
   return (
     <Router>
-      <div className='App'>
+      <div className="App">
         <NavBarComponent
           handleChange={(e) => setSearchText(e.target.value)}
           openDrawer={handleDrawerOpen}
         />
         <SideBarComponent open={openDrawer} closeDrawer={handleDrawerClose} />
         <Container>
-          <Grid container justify='center'>
+          <Grid container justify="center">
             {/* <Grid item xs={12}> asdfsadf</Grid> */}
 
-            <Grid item xs={12} container justify='center' spacing={2}>
-              {showSellsForm ? (
-                <Grid item xs={10} className='Tabla'>
-                  <SellingFormComponent
-                    products={products}
-                    clients={clients}
-                  ></SellingFormComponent>
-                </Grid>
-              ) : null}
-            </Grid>
-            <Grid item xs={12} container justify='center' spacing={2}>
-              <Box mt={5}>
+            <Grid item xs={12} container justify="center" spacing={2}>
+              <Box mt={9}>
                 <Switch>
-                  <Route path='/registrar-venta'>
+                  <Route path="/registrar-venta">
                     <SellingFormComponent
                       products={products}
+                      clients={clients}
                     />
                   </Route>
-                  <Route path='/'>
+                  <Route path="/lista-clientes">
+                    <ClientListComponent clients={clients} />
+                  </Route>
+                  <Route path="/">
                     <TablaComponent
                       products={filteredProducts}
                       stickyHeaderOn={!showSellsForm}
